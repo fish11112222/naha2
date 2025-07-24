@@ -27,7 +27,7 @@
     },
     {
       "source": "/api/users/count",
-      "destination": "/api/users"
+      "destination": "/api/users/count"
     },
     {
       "source": "/api/users/online",
@@ -47,7 +47,7 @@
     },
     {
       "source": "/api/users",
-      "destination": "/api/users"
+      "destination": "/api/users/index"
     },
     {
       "source": "/api/messages/([^/]+)",
