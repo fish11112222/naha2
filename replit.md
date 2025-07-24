@@ -339,6 +339,14 @@ User prefers communication in Thai language for all interactions.
 - ✅ ระบบพร้อมใช้งานใน Replit Environment อย่างสมบูรณ์
 - ✅ ผู้ใช้สามารถเริ่มพัฒนาและใช้งานได้ทันที
 
+### Vercel Deployment Issues Identified (July 24, 2025 - 4:05 PM)
+- ✅ **Authentication System**: Login works perfectly (kuy@gmail.com / 12345qazAZ)
+- ✅ **Theme System**: Theme switching works (Purple Dreams → Sunset Orange)
+- ❌ **Profile System**: API endpoints return 404 NOT_FOUND errors
+- ❌ **User Management**: `/api/users/1/profile` และ `/api/users` ไม่ทำงาน
+- 🔍 **Root Cause**: Vercel routing configuration หรือ API handler parsing issues
+- ✅ **Replit Environment**: ทำงานได้สมบูรณ์ทุกฟีเจอร์
+
 ### Complete PostgreSQL Database Implementation (July 24, 2025 - 3:15 PM)
 - ✅ **สร้าง PostgreSQL Database สำเร็จ**: ใช้ Replit Database Service
 - ✅ **อัปเดต Storage System**: เปลี่ยนจาก MemoryStorage เป็น DatabaseStorage
