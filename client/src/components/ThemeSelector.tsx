@@ -259,9 +259,21 @@ export default function ThemeSelector({ currentTheme, onThemeChange }: ThemeSele
     document.body.style.backgroundColor = theme.backgroundColor;
   };
 
-  const handleThemeSelect = (theme: typeof defaultThemes[0]) => {
-    // For default themes, use the numeric ID. For new API themes, use string ID
-    const themeId = typeof theme.id === 'string' ? theme.id : theme.id;
+  const handleThemeSelect = (theme: typeof defaultThemes[0] | any) => {
+    // Convert numeric ID to string ID for new API format
+    let themeId;
+    if (typeof theme.id === 'string') {
+      themeId = theme.id;
+    } else {
+      // Map numeric IDs to string IDs
+      const idMap: {[key: number]: string} = {
+        1: 'classic-blue',
+        2: 'sunset-orange', 
+        3: 'forest-green',
+        4: 'purple-dreams'
+      };
+      themeId = idMap[theme.id] || 'classic-blue';
+    }
     changeThemeMutation.mutate(themeId);
   };
 
