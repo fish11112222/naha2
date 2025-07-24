@@ -1,0 +1,69 @@
+{
+  "version": 2,
+  "buildCommand": "cd client && npm install && npm run build",
+  "outputDirectory": "client/dist",
+  "installCommand": "npm install && cd api && npm install && cd ../client && npm install",
+  "framework": "vite",
+
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/auth/signup",
+      "destination": "/api/auth"
+    },
+    {
+      "source": "/api/auth/signin", 
+      "destination": "/api/auth"
+    },
+    {
+      "source": "/api/users/count",
+      "destination": "/api/users"
+    },
+    {
+      "source": "/api/users/online",
+      "destination": "/api/users"
+    },
+    {
+      "source": "/api/users/([^/]+)/activity",
+      "destination": "/api/users"
+    },
+    {
+      "source": "/api/users/([^/]+)/profile",
+      "destination": "/api/users"
+    },
+    {
+      "source": "/api/users/([^/]+)",
+      "destination": "/api/users"
+    },
+    {
+      "source": "/api/users",
+      "destination": "/api/users"
+    },
+    {
+      "source": "/api/messages/([^/]+)",
+      "destination": "/api/messages"
+    },
+    {
+      "source": "/api/messages",
+      "destination": "/api/messages"
+    },
+    {
+      "source": "/api/theme",
+      "destination": "/api/theme"
+    },
+    {
+      "source": "/((?!api).*)",
+      "destination": "/index.html"
+    }
+  ]
+}

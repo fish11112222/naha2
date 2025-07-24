@@ -1,0 +1,23 @@
+ใน Replit Shell ให้รันคำสั่งนี้ตามลำดับ:
+
+1. เช็คว่า repo มีอะไรอยู่
+git ls-remote origin
+
+2. แก้ปัญหา history conflicts:
+git pull origin main --allow-unrelated-histories --no-rebase
+
+3. หาก step 2 ไม่ได้ ให้ลองนี้:
+git fetch origin main
+git reset --hard origin/main
+git add .
+git commit -m "Complete project setup for Vercel"
+
+4. Force push with token:
+git push https://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@github.com/fish11112222/isus.git main --force
+
+5. หาก error ยังอยู่ ให้สร้าง repo ใหม่:
+- ไป GitHub สร้าง repo ใหม่ชื่อ "thai-chat-app" 
+- รัน: git remote set-url origin https://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@github.com/fish11112222/thai-chat-app.git
+- รัน: git push https://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@github.com/fish11112222/thai-chat-app.git main --force
+
+ลองทีละขั้นตอนแล้วบอกผลนะครับ
