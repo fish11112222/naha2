@@ -1,0 +1,8 @@
+{
+  "name": "thai-chat-api",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@vercel/node": "^5.3.6"
+  }
+}
