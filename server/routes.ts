@@ -425,6 +425,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Simple Theme routes for Vercel compatibility
+  app.get('/api/simple-theme', async (req, res) => {
+    try {
+      const currentTheme = await storage.getActiveTheme();
+      const availableThemes = await storage.getAvailableThemes();
+      
+      // Convert to new format for consistency
+      const convertTheme = (theme: any) => ({
+        id: theme.id === 1 ? 'classic-blue' : 
+            theme.id === 2 ? 'sunset-orange' :
+            theme.id === 3 ? 'forest-green' :
+            theme.id === 4 ? 'purple-dreams' : 'classic-blue',
+        name: theme.name,
+        colors: {
+          primary: theme.primaryColor,
+          secondary: theme.secondaryColor,
+          background: theme.backgroundColor,
+          text: theme.textColor,
+          border: theme.messageBackgroundOther
+        }
+      });
+      
+      res.json({
+        currentTheme: currentTheme ? convertTheme(currentTheme) : {
+          id: 'classic-blue',
+          name: 'Classic Blue',
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#1e40af',
+            background: '#f8fafc',
+            text: '#1f2937',
+            border: '#e5e7eb'
+          }
+        },
+        availableThemes: availableThemes.map(convertTheme)
+      });
+    } catch (error) {
+      console.error('Theme error:', error);
+      res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
+    }
+  });
+
+  app.post('/api/simple-theme', async (req, res) => {
+    try {
+      const { themeId } = req.body;
+      if (!themeId) {
+        return res.status(400).json({ message: 'กรุณาระบุ theme ID' });
+      }
+      
+      // Convert string ID to numeric ID
+      const idMap: {[key: string]: number} = {
+        'classic-blue': 1,
+        'sunset-orange': 2,
+        'forest-green': 3,
+        'purple-dreams': 4
+      };
+      
+      const numericId = idMap[themeId] || 1;
+      const theme = await storage.setActiveTheme(numericId);
+      
+      const convertedTheme = {
+        id: themeId,
+        name: theme.name,
+        colors: {
+          primary: theme.primaryColor,
+          secondary: theme.secondaryColor,
+          background: theme.backgroundColor,
+          text: theme.textColor,
+          border: theme.messageBackgroundOther
+        }
+      };
+      
+      res.json({
+        message: 'เปลี่ยนธีมสำเร็จ',
+        currentTheme: convertedTheme,
+        availableThemes: (await storage.getAvailableThemes()).map(t => ({
+          id: t.id === 1 ? 'classic-blue' : 
+              t.id === 2 ? 'sunset-orange' :
+              t.id === 3 ? 'forest-green' : 'purple-dreams',
+          name: t.name,
+          colors: {
+            primary: t.primaryColor,
+            secondary: t.secondaryColor,
+            background: t.backgroundColor,
+            text: t.textColor,
+            border: t.messageBackgroundOther
+          }
+        }))
+      });
+    } catch (error) {
+      console.error('Theme change error:', error);
+      res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
+    }
+  });
+
+  // Simple Users routes for Vercel compatibility
+  app.get('/api/simple-users', async (req, res) => {
+    try {
+      const { action } = req.query;
+      
+      if (action === 'count') {
+        const count = await storage.getUsersCount();
+        return res.json({ count });
+      }
+      
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error('Users error:', error);
+      res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

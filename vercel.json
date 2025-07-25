@@ -27,7 +27,7 @@
     },
     {
       "source": "/api/users/count",
-      "destination": "/api/users/count"
+      "destination": "/api/simple-users?action=count"
     },
     {
       "source": "/api/users/online",
@@ -47,7 +47,7 @@
     },
     {
       "source": "/api/users",
-      "destination": "/api/users/index"
+      "destination": "/api/simple-users"
     },
     {
       "source": "/api/messages/([^/]+)",
@@ -59,7 +59,7 @@
     },
     {
       "source": "/api/theme",
-      "destination": "/api/theme"
+      "destination": "/api/simple-theme"
     },
     {
       "source": "/((?!api).*)",
