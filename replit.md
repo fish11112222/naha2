@@ -403,6 +403,15 @@ User requested communication exclusively in Thai language (คุยเป็น
 - ✅ **Working login credentials**: kuy@gmail.com/123456 และ admin@chat.com/admin123
 - 🎯 **Solution**: Always use main domain https://naha2-hliq.vercel.app/ instead of preview URLs
 
+### Vercel SPA Routing Fix (July 25, 2025 - 1:30 PM)
+- ✅ **Fixed 404 NOT_FOUND errors for /chat route**
+- ✅ **Added SPA routing configuration in vercel.json**
+- ✅ **Implemented proper rewrites for client-side routing**
+- ✅ **Fixed Function Runtimes error by removing invalid functions config**
+- ✅ **Added CORS headers for API endpoints**
+- ✅ **Enhanced vercel.json with proper SPA support**
+- 🎯 **Result**: /chat route now works correctly after deployment
+
 ### Complete Vercel Deployment Fix (July 25, 2025 - 1:15 PM)
 - ✅ **แก้ไข Vercel 404 NOT_FOUND errors สมบูรณ์**
 - ✅ **สร้าง API endpoints ใหม่สำหรับ Vercel**: /api/auth/signin, /api/auth/signup, /api/messages, /api/theme, /api/users

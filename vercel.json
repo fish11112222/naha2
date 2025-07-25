@@ -2,23 +2,7 @@
   "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/dist",
   "installCommand": "cd client && npm install",
-  "functions": {
-    "api/auth/signin.js": {
-      "runtime": "@vercel/node"
-    },
-    "api/auth/signup.js": {
-      "runtime": "@vercel/node"
-    },
-    "api/messages/index.js": {
-      "runtime": "@vercel/node"
-    },
-    "api/theme.js": {
-      "runtime": "@vercel/node"
-    },
-    "api/users/index.js": {
-      "runtime": "@vercel/node"
-    }
-  },
+
   "rewrites": [
     {
       "source": "/api/(.*)",
