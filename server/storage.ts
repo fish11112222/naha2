@@ -1,8 +1,5 @@
 
 import { type User, type SignUpData, type SignInData, type Message, type InsertMessage, type UpdateMessage, type ChatTheme, type ChatSettings, type UpdateProfile } from "@shared/schema";
-import { db } from "./db";
-import { users, messages, chatThemes } from "@shared/schema";
-import { eq, desc } from "drizzle-orm";
 import * as fs from 'fs';
 
 export interface IStorage {
@@ -490,157 +487,15 @@ export class MemoryStorage implements IStorage {
   }
 }
 
-// Database Storage Implementation
-
+// Database Storage Implementation (disabled for migration)
+// To re-enable: provide DATABASE_URL and uncomment this class
+/*
 export class DatabaseStorage implements IStorage {
-  async getUser(id: number): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.id, id));
-    return result[0] || undefined;
-  }
-
-  async getUserByEmail(email: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.email, email));
-    return result[0] || undefined;
-  }
-
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    const result = await db.select().from(users).where(eq(users.username, username));
-    return result[0] || undefined;
-  }
-
-  async getAllUsers(): Promise<User[]> {
-    return await db.select().from(users);
-  }
-
-  async createUser(signUpData: SignUpData): Promise<User> {
-    const result = await db.insert(users).values(signUpData).returning();
-    return result[0];
-  }
-
-  async authenticateUser(credentials: SignInData): Promise<User | null> {
-    const user = await this.getUserByEmail(credentials.email);
-    if (!user || user.password !== credentials.password) {
-      return null;
-    }
-    return user;
-  }
-
-  async updateUserProfile(userId: number, updates: UpdateProfile): Promise<User | null> {
-    const updateData: any = {};
-    if (updates.firstName !== undefined) updateData.firstName = updates.firstName;
-    if (updates.lastName !== undefined) updateData.lastName = updates.lastName;
-    if (updates.bio !== undefined) updateData.bio = updates.bio;
-    if (updates.location !== undefined) updateData.location = updates.location;
-    if (updates.website !== undefined) updateData.website = updates.website;
-    if (updates.avatar !== undefined) updateData.avatar = updates.avatar;
-    if (updates.dateOfBirth !== undefined) updateData.dateOfBirth = new Date(updates.dateOfBirth);
-
-    const result = await db.update(users)
-      .set(updateData)
-      .where(eq(users.id, userId))
-      .returning();
-    
-    return result[0] || null;
-  }
-
-  async getMessages(): Promise<Message[]> {
-    return await db.select().from(messages).orderBy(desc(messages.createdAt));
-  }
-
-  async createMessage(insertMessage: InsertMessage): Promise<Message> {
-    const result = await db.insert(messages).values({
-      content: insertMessage.content || "",
-      username: insertMessage.username,
-      userId: insertMessage.userId,
-      attachmentUrl: insertMessage.attachmentUrl || null,
-      attachmentType: insertMessage.attachmentType || null,
-      attachmentName: insertMessage.attachmentName || null,
-    }).returning();
-    
-    return result[0];
-  }
-
-  async updateMessage(id: number, userId: number, updates: UpdateMessage): Promise<Message | null> {
-    const result = await db.update(messages)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(messages.id, id))
-      .returning();
-    
-    const message = result[0];
-    if (!message || message.userId !== userId) {
-      return null;
-    }
-    
-    return message;
-  }
-
-  async deleteMessage(id: number, userId: number): Promise<boolean> {
-    // First verify the message exists and belongs to the user
-    const message = await db.select().from(messages).where(eq(messages.id, id));
-    
-    if (!message[0] || message[0].userId !== userId) {
-      return false;
-    }
-
-    const result = await db.delete(messages).where(eq(messages.id, id)).returning();
-    return result.length > 0;
-  }
-
-  async getMessageById(id: number): Promise<Message | undefined> {
-    const result = await db.select().from(messages).where(eq(messages.id, id));
-    return result[0] || undefined;
-  }
-
-  // Placeholder implementations for theme methods (using memory)
-  private currentThemeId = 1;
-  private themes = new Map([
-    [1, { id: 1, name: "Classic Blue", primaryColor: "#3b82f6", secondaryColor: "#1e40af", backgroundColor: "#f8fafc", messageBackgroundSelf: "#3b82f6", messageBackgroundOther: "#e2e8f0", textColor: "#1e293b", isActive: true, createdAt: new Date() }],
-    [2, { id: 2, name: "Sunset Orange", primaryColor: "#f59e0b", secondaryColor: "#d97706", backgroundColor: "#fef3c7", messageBackgroundSelf: "#f59e0b", messageBackgroundOther: "#fed7aa", textColor: "#92400e", isActive: false, createdAt: new Date() }],
-    [3, { id: 3, name: "Forest Green", primaryColor: "#10b981", secondaryColor: "#059669", backgroundColor: "#ecfdf5", messageBackgroundSelf: "#10b981", messageBackgroundOther: "#d1fae5", textColor: "#064e3b", isActive: false, createdAt: new Date() }]
-  ]);
-
-  async getActiveTheme(): Promise<ChatTheme | undefined> {
-    return this.themes.get(this.currentThemeId);
-  }
-
-  async getAvailableThemes(): Promise<ChatTheme[]> {
-    return Array.from(this.themes.values());
-  }
-
-  async setActiveTheme(themeId: number): Promise<ChatTheme> {
-    const theme = this.themes.get(themeId);
-    if (!theme) {
-      throw new Error(`Theme with ID ${themeId} not found`);
-    }
-    this.currentThemeId = themeId;
-    return theme;
-  }
-
-  async getUsersCount(): Promise<number> {
-    const result = await db.select().from(users);
-    return result.length;
-  }
-
-  async getOnlineUsers(): Promise<User[]> {
-    return await db.select().from(users);
-  }
-
-  async updateUserActivity(userId: number): Promise<void> {
-    await db.update(users)
-      .set({ lastActivity: new Date() })
-      .where(eq(users.id, userId));
-  }
-
-  async getTotalUsersCount(): Promise<number> {
-    const result = await db.select().from(users);
-    return result.length;
-  }
-
-  async getUserMessageCount(userId: number): Promise<number> {
-    const result = await db.select().from(messages).where(eq(messages.userId, userId));
-    return result.length;
-  }
+  // DatabaseStorage implementation commented out for migration
+  // Will be re-enabled when PostgreSQL database is provisioned
 }
+*/
 
-// Use DatabaseStorage instead of MemoryStorage
-export const storage = new DatabaseStorage();
+// Use MemoryStorage for migration to Replit environment
+// Switch to DatabaseStorage when database is provisioned
+export const storage = new MemoryStorage();
