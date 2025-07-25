@@ -1,10 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
 
-// For Vercel deployment, use fallback storage to avoid import issues
-const USE_DATABASE = false;
-
-// Type definitions
 type Message = {
   id: number;
   content: string;
@@ -17,8 +13,8 @@ type Message = {
   updatedAt: string | Date | null;
 };
 
-// Fallback storage
-const SHARED_STORAGE_KEY = 'VERCEL_SHARED_MESSAGES_GLOBAL';
+// Global storage for Vercel deployment
+const SHARED_STORAGE_KEY = 'VERCEL_SHARED_MESSAGES_SIMPLE';
 const DEFAULT_MESSAGES: Message[] = [
   {
     id: 1,
@@ -123,25 +119,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (isSpecificMessage) {
         // GET specific message
         const id = parseInt(messageId);
-        
-        {
-          const messageList = getMessages();
-          const message = messageList.find(m => m.id === id);
-          if (!message) {
-            return res.status(404).json({ message: 'ไม่พบข้อความ' });
-          }
-          return res.status(200).json(message);
+        const messageList = getMessages();
+        const message = messageList.find(m => m.id === id);
+        if (!message) {
+          return res.status(404).json({ message: 'ไม่พบข้อความ' });
         }
+        return res.status(200).json(message);
       } else {
         // GET all messages
         const limit = parseInt(req.query.limit as string) || 50;
-        
-        {
-          const messageList = getMessages();
-          const paginatedMessages = messageList.slice(-limit);
-          console.log(`Retrieved ${paginatedMessages.length} messages from fallback storage`);
-          return res.status(200).json(paginatedMessages);
-        }
+        const messageList = getMessages();
+        const paginatedMessages = messageList.slice(-limit);
+        console.log(`Retrieved ${paginatedMessages.length} messages from Vercel storage`);
+        return res.status(200).json(paginatedMessages);
       }
     }
     
@@ -160,28 +150,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
       
       const validatedData = messageSchema.parse(requestBody);
+      const newId = generateMessageId();
+      const newMessage: Message = {
+        id: newId,
+        content: validatedData.content || "",
+        username: validatedData.username,
+        userId: validatedData.userId,
+        attachmentUrl: validatedData.attachmentUrl || null,
+        attachmentType: validatedData.attachmentType || null,
+        attachmentName: validatedData.attachmentName || null,
+        createdAt: new Date().toISOString(),
+        updatedAt: null
+      };
       
-      {
-        const newId = generateMessageId();
-        const newMessage: Message = {
-          id: newId,
-          content: validatedData.content || "",
-          username: validatedData.username,
-          userId: validatedData.userId,
-          attachmentUrl: validatedData.attachmentUrl || null,
-          attachmentType: validatedData.attachmentType || null,
-          attachmentName: validatedData.attachmentName || null,
-          createdAt: new Date().toISOString(),
-          updatedAt: null
-        };
-        
-        const currentMessages = getMessages();
-        currentMessages.push(newMessage);
-        saveMessages(currentMessages);
-        
-        console.log(`Created message ${newId} in fallback storage`);
-        return res.status(201).json(newMessage);
-      }
+      const currentMessages = getMessages();
+      currentMessages.push(newMessage);
+      saveMessages(currentMessages);
+      
+      console.log(`Created message ${newId} in Vercel storage`);
+      return res.status(201).json(newMessage);
     }
 
     if (req.method === 'PUT' && isSpecificMessage) {
@@ -206,41 +193,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ message: 'กรุณาระบุ ID ผู้ใช้' });
       }
 
-      if (USE_DATABASE && db && messages && eq) {
-        const existingMessage = await db.select().from(messages).where(eq(messages.id, id));
-        if (!existingMessage[0] || existingMessage[0].userId !== userId) {
-          return res.status(404).json({ message: 'ไม่พบข้อความหรือคุณไม่มีสิทธิ์แก้ไข' });
-        }
-
-        const result = await db.update(messages)
-          .set({ 
-            content: validatedData.content,
-            updatedAt: new Date()
-          })
-          .where(eq(messages.id, id))
-          .returning();
-
-        const updatedMessage = result[0];
-        console.log(`Updated message ${id} in database`);
-        return res.status(200).json(updatedMessage);
-      } else {
-        const messageList = getMessages();
-        const messageIndex = messageList.findIndex(m => m.id === id);
-        
-        if (messageIndex === -1 || messageList[messageIndex].userId !== userId) {
-          return res.status(404).json({ message: 'ไม่พบข้อความหรือคุณไม่มีสิทธิ์แก้ไข' });
-        }
-
-        messageList[messageIndex] = {
-          ...messageList[messageIndex],
-          content: validatedData.content,
-          updatedAt: new Date().toISOString()
-        };
-
-        saveMessages(messageList);
-        console.log(`Updated message ${id} in fallback storage`);
-        return res.status(200).json(messageList[messageIndex]);
+      const messageList = getMessages();
+      const messageIndex = messageList.findIndex(m => m.id === id);
+      
+      if (messageIndex === -1 || messageList[messageIndex].userId !== userId) {
+        return res.status(404).json({ message: 'ไม่พบข้อความหรือคุณไม่มีสิทธิ์แก้ไข' });
       }
+
+      messageList[messageIndex] = {
+        ...messageList[messageIndex],
+        content: validatedData.content,
+        updatedAt: new Date().toISOString()
+      };
+
+      saveMessages(messageList);
+      console.log(`Updated message ${id} in Vercel storage`);
+      return res.status(200).json(messageList[messageIndex]);
     }
 
     if (req.method === 'DELETE' && isSpecificMessage) {
@@ -251,35 +219,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ message: 'กรุณาระบุ ID ผู้ใช้' });
       }
 
-      if (USE_DATABASE && db && messages && eq) {
-        const existingMessage = await db.select().from(messages).where(eq(messages.id, id));
-        if (!existingMessage[0] || existingMessage[0].userId !== userId) {
-          console.log(`Delete failed: Message ${id} not found or not owned by user ${userId}`);
-          return res.status(404).json({ message: 'ไม่พบข้อความหรือคุณไม่มีสิทธิ์ลบ' });
-        }
-
-        const result = await db.delete(messages).where(eq(messages.id, id)).returning();
-        
-        if (result.length > 0) {
-          console.log(`Deleted message ${id} from database`);
-          return res.status(204).end();
-        } else {
-          return res.status(404).json({ message: 'ไม่สามารถลบข้อความได้' });
-        }
-      } else {
-        const messageList = getMessages();
-        const messageIndex = messageList.findIndex(m => m.id === id);
-        
-        if (messageIndex === -1 || messageList[messageIndex].userId !== userId) {
-          console.log(`Delete failed: Message ${id} not found or not owned by user ${userId}`);
-          return res.status(404).json({ message: 'ไม่พบข้อความหรือคุณไม่มีสิทธิ์ลบ' });
-        }
-
-        messageList.splice(messageIndex, 1);
-        saveMessages(messageList);
-        console.log(`Deleted message ${id} from fallback storage`);
-        return res.status(204).end();
+      const messageList = getMessages();
+      const messageIndex = messageList.findIndex(m => m.id === id);
+      
+      if (messageIndex === -1 || messageList[messageIndex].userId !== userId) {
+        console.log(`Delete failed: Message ${id} not found or not owned by user ${userId}`);
+        return res.status(404).json({ message: 'ไม่พบข้อความหรือคุณไม่มีสิทธิ์ลบ' });
       }
+
+      messageList.splice(messageIndex, 1);
+      saveMessages(messageList);
+      console.log(`Deleted message ${id} from Vercel storage`);
+      return res.status(204).end();
     }
     
     return res.status(405).json({ message: 'Method not allowed' });

@@ -1,23 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
 
-// Use environment variable to determine storage type
-const USE_DATABASE = process.env.DATABASE_URL ? true : false;
-
-// Conditional imports
-let db: any, messages: any, desc: any, eq: any;
-if (USE_DATABASE) {
-  try {
-    const dbModule = require('./db');
-    db = dbModule.db;
-    messages = dbModule.messages;
-    const drizzleModule = require('drizzle-orm');
-    desc = drizzleModule.desc;
-    eq = drizzleModule.eq;
-  } catch (error) {
-    console.log('Database not available, using fallback storage');
-  }
-}
+// For Vercel deployment, use fallback storage to avoid import issues
+const USE_DATABASE = false;
 
 // Type definitions
 type Message = {

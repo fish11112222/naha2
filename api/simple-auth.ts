@@ -1,9 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { z } from 'zod';
 
-// For Vercel deployment, use fallback storage to avoid import issues
-const USE_DATABASE = false;
-
 interface User {
   id: number;
   username: string;
@@ -21,8 +18,8 @@ interface User {
   createdAt: string;
 }
 
-// Fallback storage
-const SHARED_USERS_KEY = 'VERCEL_SHARED_USERS_GLOBAL';
+// Global storage for Vercel deployment
+const SHARED_USERS_KEY = 'VERCEL_SHARED_USERS_SIMPLE_AUTH';
 const DEFAULT_USERS: User[] = [
   {
     id: 1,
@@ -44,7 +41,7 @@ const DEFAULT_USERS: User[] = [
     id: 2,
     username: "panida",
     email: "panida@gmail.com",
-    password: "12345qazAZ",
+    password: "panida123",
     firstName: "Panida",
     lastName: "ใสใจ",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=panida",
@@ -55,6 +52,38 @@ const DEFAULT_USERS: User[] = [
     isOnline: true,
     lastActivity: new Date().toISOString(),
     createdAt: "2025-07-22T12:00:00.000Z"
+  },
+  {
+    id: 3,
+    username: "sirinat",
+    email: "sirinat@gmail.com",
+    password: "sirinat2023",
+    firstName: "Sirinat",
+    lastName: "Chanmali",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sirinat",
+    bio: "ชอบเล่นเกม และพัฒนาแอปมือถือ",
+    location: "ภูเก็ต", 
+    website: "https://sirinat.dev",
+    dateOfBirth: "1993-08-22",
+    isOnline: false,
+    lastActivity: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2025-07-20T15:30:00.000Z"
+  },
+  {
+    id: 4,
+    username: "admin",
+    email: "admin@chat.com",
+    password: "admin2025",
+    firstName: "แอดมิน",
+    lastName: "ระบบ",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
+    bio: "ผู้ดูแลระบบแชท และพัฒนาฟีเจอร์ใหม่ๆ",
+    location: "ทั่วประเทศไทย",
+    website: "https://chat.example.com",
+    dateOfBirth: "1990-01-01",
+    isOnline: true,
+    lastActivity: new Date().toISOString(),
+    createdAt: "2025-07-15T08:00:00.000Z"
   }
 ];
 
@@ -122,70 +151,64 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (isSignup) {
       // SIGNUP
       const validatedData = signUpSchema.parse(requestBody);
-
-      {
-        const userList = getUsers();
-        
-        // Check if email already exists
-        const existingEmail = userList.find(u => u.email === validatedData.email);
-        if (existingEmail) {
-          return res.status(409).json({ message: 'อีเมลนี้ถูกใช้แล้ว' });
-        }
-
-        // Check if username already exists
-        const existingUsername = userList.find(u => u.username === validatedData.username);
-        if (existingUsername) {
-          return res.status(409).json({ message: 'ชื่อผู้ใช้นี้ถูกใช้แล้ว' });
-        }
-
-        const newId = Math.max(...userList.map(u => u.id), 0) + 1;
-        const newUser: User = {
-          id: newId,
-          username: validatedData.username,
-          email: validatedData.email,
-          password: validatedData.password,
-          firstName: validatedData.firstName,
-          lastName: validatedData.lastName,
-          avatar: null,
-          bio: null,
-          location: null,
-          website: null,
-          dateOfBirth: null,
-          isOnline: true,
-          lastActivity: new Date().toISOString(),
-          createdAt: new Date().toISOString()
-        };
-
-        userList.push(newUser);
-        saveUsers(userList);
-
-        const { password, ...userWithoutPassword } = newUser;
-        console.log(`Created user ${newUser.id} (${newUser.email}) in fallback storage`);
-        return res.status(201).json(userWithoutPassword);
+      const userList = getUsers();
+      
+      // Check if email already exists
+      const existingEmail = userList.find(u => u.email === validatedData.email);
+      if (existingEmail) {
+        return res.status(409).json({ message: 'อีเมลนี้ถูกใช้แล้ว' });
       }
+
+      // Check if username already exists
+      const existingUsername = userList.find(u => u.username === validatedData.username);
+      if (existingUsername) {
+        return res.status(409).json({ message: 'ชื่อผู้ใช้นี้ถูกใช้แล้ว' });
+      }
+
+      const newId = Math.max(...userList.map(u => u.id), 0) + 1;
+      const newUser: User = {
+        id: newId,
+        username: validatedData.username,
+        email: validatedData.email,
+        password: validatedData.password,
+        firstName: validatedData.firstName,
+        lastName: validatedData.lastName,
+        avatar: null,
+        bio: null,
+        location: null,
+        website: null,
+        dateOfBirth: null,
+        isOnline: true,
+        lastActivity: new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      };
+
+      userList.push(newUser);
+      saveUsers(userList);
+
+      const { password, ...userWithoutPassword } = newUser;
+      console.log(`Created user ${newUser.id} (${newUser.email}) in Vercel storage`);
+      return res.status(201).json(userWithoutPassword);
     } else {
       // SIGNIN
       const validatedData = signInSchema.parse(requestBody);
+      const userList = getUsers();
+      const user = userList.find(u => u.email === validatedData.email);
 
-      {
-        const userList = getUsers();
-        const user = userList.find(u => u.email === validatedData.email);
-
-        if (!user || user.password !== validatedData.password) {
-          return res.status(401).json({ message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
-        }
-
-        // Update last activity
-        user.isOnline = true;
-        user.lastActivity = new Date().toISOString();
-        saveUsers(userList);
-
-        const { password, ...userWithoutPassword } = user;
-        console.log(`User ${user.id} (${user.email}) signed in via fallback storage`);
-        return res.status(200).json(userWithoutPassword);
+      if (!user || user.password !== validatedData.password) {
+        return res.status(401).json({ message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
       }
-    }
 
+      // Update user activity
+      user.isOnline = true;
+      user.lastActivity = new Date().toISOString();
+      saveUsers(userList);
+
+      const { password, ...userWithoutPassword } = user;
+      console.log(`User ${user.id} (${user.email}) signed in via Vercel storage`);
+      return res.status(200).json(userWithoutPassword);
+    }
+    
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ 
