@@ -220,15 +220,29 @@ export default function ThemeSelector({ currentTheme, onThemeChange }: ThemeSele
       
       // Apply theme immediately to CSS variables with new format
       const root = document.documentElement;
-      root.style.setProperty('--chat-primary', theme.colors?.primary || theme.primaryColor || '#3b82f6');
-      root.style.setProperty('--chat-secondary', theme.colors?.secondary || theme.secondaryColor || '#1e40af');
-      root.style.setProperty('--chat-background', theme.colors?.background || theme.backgroundColor || '#f8fafc');
-      root.style.setProperty('--chat-message-self', theme.colors?.primary || theme.messageBackgroundSelf || '#3b82f6');
-      root.style.setProperty('--chat-message-other', theme.colors?.border || theme.messageBackgroundOther || '#e2e8f0');
-      root.style.setProperty('--chat-text', theme.colors?.text || theme.textColor || '#1e293b');
+      const primaryColor = theme.colors?.primary || '#3b82f6';
+      const secondaryColor = theme.colors?.secondary || '#1e40af';
+      const backgroundColor = theme.colors?.background || '#f8fafc';
+      const textColor = theme.colors?.text || '#1e293b';
+      const borderColor = theme.colors?.border || '#e2e8f0';
+      
+      root.style.setProperty('--chat-primary', primaryColor);
+      root.style.setProperty('--chat-secondary', secondaryColor);
+      root.style.setProperty('--chat-background', backgroundColor);
+      root.style.setProperty('--chat-message-self', primaryColor);
+      root.style.setProperty('--chat-message-other', borderColor);
+      root.style.setProperty('--chat-text', textColor);
       
       // Update body background
-      document.body.style.backgroundColor = theme.colors?.background || theme.backgroundColor || '#f8fafc';
+      document.body.style.backgroundColor = backgroundColor;
+      
+      console.log(`Theme changed to: ${theme.name}`, {
+        primaryColor,
+        secondaryColor,
+        backgroundColor,
+        textColor,
+        borderColor
+      });
       
       // Invalidate queries to refresh
       queryClient.invalidateQueries({ queryKey: ['/api/theme'] });

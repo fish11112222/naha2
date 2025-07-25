@@ -400,8 +400,8 @@ export default function EnhancedChatPage({ currentUser, onSignOut }: EnhancedCha
     <div 
       className="min-h-screen transition-colors duration-300"
       style={{ 
-        backgroundColor: themeData?.currentTheme?.backgroundColor || '#f8fafc',
-        color: themeData?.currentTheme?.textColor || '#1e293b'
+        backgroundColor: themeData?.currentTheme?.colors?.background || '#f8fafc',
+        color: themeData?.currentTheme?.colors?.text || '#1e293b'
       }}
     >
       {/* Header - สวยขึ้นและสูงกว่า */}
@@ -409,7 +409,7 @@ export default function EnhancedChatPage({ currentUser, onSignOut }: EnhancedCha
         <CardHeader 
           className="py-4 sm:py-6 px-4 sm:px-8" 
           style={{ 
-            background: `linear-gradient(135deg, ${themeData?.currentTheme?.primaryColor || '#3b82f6'}, ${themeData?.currentTheme?.secondaryColor || '#1e40af'})`,
+            background: `linear-gradient(135deg, ${themeData?.currentTheme?.colors?.primary || '#3b82f6'}, ${themeData?.currentTheme?.colors?.secondary || '#1e40af'})`,
             borderBottom: '1px solid rgba(255,255,255,0.1)'
           }}
         >
@@ -520,8 +520,8 @@ export default function EnhancedChatPage({ currentUser, onSignOut }: EnhancedCha
                               }`}
                               style={{
                                 backgroundColor: isOwnMessage 
-                                  ? themeData?.currentTheme?.messageBackgroundSelf || '#3b82f6'
-                                  : themeData?.currentTheme?.messageBackgroundOther || '#e2e8f0',
+                                  ? themeData?.currentTheme?.colors?.primary || '#3b82f6'
+                                  : themeData?.currentTheme?.colors?.border || '#e2e8f0',
                                 color: isOwnMessage 
                                   ? '#ffffff' 
                                   : themeData?.currentTheme?.textColor || '#1e293b'
