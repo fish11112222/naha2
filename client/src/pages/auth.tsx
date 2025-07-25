@@ -53,9 +53,20 @@ export default function AuthPage({ onAuthSuccess }: AuthPageProps) {
       onAuthSuccess(user);
     },
     onError: (error: any) => {
+      console.error('Sign up error:', error);
+      let errorMessage = "ไม่สามารถสมัครสมาชิกได้";
+      
+      if (error.message?.includes('409')) {
+        errorMessage = "อีเมลนี้ถูกใช้งานแล้ว";
+      } else if (error.message?.includes('400')) {
+        errorMessage = "ข้อมูลไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง";
+      } else if (error.message?.includes('500')) {
+        errorMessage = "เกิดข้อผิดพลาดในระบบ";
+      }
+      
       toast({
-        title: "Sign up failed",
-        description: error.message || "Failed to create account. Please try again.",
+        title: "สมัครสมาชิกไม่สำเร็จ",
+        description: errorMessage,
         variant: "destructive",
       });
     },
@@ -75,9 +86,20 @@ export default function AuthPage({ onAuthSuccess }: AuthPageProps) {
       onAuthSuccess(user);
     },
     onError: (error: any) => {
+      console.error('Sign in error:', error);
+      let errorMessage = "ไม่สามารถเข้าสู่ระบบได้";
+      
+      if (error.message?.includes('401')) {
+        errorMessage = "อีเมลหรือรหัสผ่านไม่ถูกต้อง";
+      } else if (error.message?.includes('404')) {
+        errorMessage = "ไม่พบบริการ API";
+      } else if (error.message?.includes('500')) {
+        errorMessage = "เกิดข้อผิดพลาดในระบบ";
+      }
+      
       toast({
-        title: "Sign in failed",
-        description: error.message || "Invalid email or password.",
+        title: "เข้าสู่ระบบไม่สำเร็จ",
+        description: errorMessage,
         variant: "destructive",
       });
     },
