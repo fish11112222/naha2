@@ -1,5 +1,51 @@
 {
   "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/dist",
-  "installCommand": "cd client && npm install"
+  "installCommand": "cd client && npm install",
+  "functions": {
+    "api/auth/signin.js": {
+      "runtime": "@vercel/node"
+    },
+    "api/auth/signup.js": {
+      "runtime": "@vercel/node"
+    },
+    "api/messages/index.js": {
+      "runtime": "@vercel/node"
+    },
+    "api/theme.js": {
+      "runtime": "@vercel/node"
+    },
+    "api/users/index.js": {
+      "runtime": "@vercel/node"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
 }
