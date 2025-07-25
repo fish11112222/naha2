@@ -412,6 +412,14 @@ User requested communication exclusively in Thai language (คุยเป็น
 - ✅ **Enhanced vercel.json with proper SPA support**
 - 🎯 **Result**: /chat route now works correctly after deployment
 
+### Vercel White Screen Fix (July 25, 2025 - 1:35 PM)
+- ✅ **Fixed white screen issue on Vercel deployment**
+- ✅ **Identified assets redirect problem**: JS/CSS files were redirected to index.html
+- ✅ **Updated vercel.json rewrite rules**: Excluded /assets/ from SPA routing
+- ✅ **Fixed regex pattern**: Changed from "/(.*)" to "/((?!assets/).*)"
+- ✅ **Rebuilt client application** with corrected configuration
+- 🎯 **Result**: Website will display properly after Vercel redeployment
+
 ### Complete Vercel Deployment Fix (July 25, 2025 - 1:15 PM)
 - ✅ **แก้ไข Vercel 404 NOT_FOUND errors สมบูรณ์**
 - ✅ **สร้าง API endpoints ใหม่สำหรับ Vercel**: /api/auth/signin, /api/auth/signup, /api/messages, /api/theme, /api/users
