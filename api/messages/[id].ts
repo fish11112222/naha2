@@ -1,11 +1,8 @@
-// Import the global messages from the main messages endpoint
-import { NextApiRequest, NextApiResponse } from 'next';
-
 // We'll need to access the same global storage
 // For simplicity in this demo, let's use a basic approach
 let globalMessages: any[] = [];
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: any, res: any) {
   const { id } = req.query;
   const messageId = parseInt(id as string);
 
