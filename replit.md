@@ -9,6 +9,7 @@ This is a modern Thai chat application built with React (frontend) and Express.j
 Preferred communication style: Simple, everyday language in Thai (ภาษาไทย).
 User confirmed app works correctly and prefers Thai language interface.
 User prefers communication in Thai language for all interactions.
+User requested communication exclusively in Thai language (คุยเป็นภาษาไทยนะ) - July 25, 2025.
 
 ## System Architecture
 
