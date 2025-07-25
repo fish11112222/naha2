@@ -10,6 +10,7 @@ Preferred communication style: Simple, everyday language in Thai (ภาษา�
 User confirmed app works correctly and prefers Thai language interface.
 User prefers communication in Thai language for all interactions.
 User requested communication exclusively in Thai language (คุยเป็นภาษาไทยนะ) - July 25, 2025.
+**IMPORTANT NOTE**: Always use main domain https://naha2-hliq.vercel.app/ - Preview URLs with random strings have Vercel authentication protection and will not work.
 
 ## System Architecture
 
