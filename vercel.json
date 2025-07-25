@@ -20,7 +20,7 @@
     {
       "source": "/api/auth/signup",
       "destination": "/api/auth"
-    },
+    },  
     {
       "source": "/api/auth/signin", 
       "destination": "/api/auth"
@@ -31,7 +31,7 @@
     },
     {
       "source": "/api/users/online",
-      "destination": "/api/users"
+      "destination": "/api/users/index"
     },
     {
       "source": "/api/users/([^/]+)/activity",
@@ -39,7 +39,7 @@
     },
     {
       "source": "/api/users/([^/]+)/profile",
-      "destination": "/api/users"
+      "destination": "/api/users/$1/profile"
     },
     {
       "source": "/api/users/([^/]+)",
@@ -47,7 +47,11 @@
     },
     {
       "source": "/api/users",
-      "destination": "/api/simple-users"
+      "destination": "/api/users/index"
+    },
+    {
+      "source": "/api/message-actions",
+      "destination": "/api/message-actions"
     },
     {
       "source": "/api/messages/([^/]+)",
@@ -59,7 +63,7 @@
     },
     {
       "source": "/api/theme",
-      "destination": "/api/simple-theme"
+      "destination": "/api/theme"
     },
     {
       "source": "/((?!api).*)",

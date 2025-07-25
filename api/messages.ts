@@ -37,10 +37,32 @@ const SHARED_STORAGE_KEY = 'VERCEL_SHARED_MESSAGES_GLOBAL';
 const DEFAULT_MESSAGES: Message[] = [
   {
     id: 1,
-    content: "สวัสดีครับ ยินดีต้อนรับสู่ห้องแชท!",
+    content: "สวัสดีครับ ยินดีต้อนรับสู่ห้องแชท! 🎉",
     username: "Panida ใสใจ",
-    userId: 18581680,
+    userId: 2,
     createdAt: "2025-07-22T12:00:00.000Z",
+    updatedAt: null,
+    attachmentUrl: null,
+    attachmentType: null,
+    attachmentName: null
+  },
+  {
+    id: 2,
+    content: "หวัดดีครับ ขอบคุณสำหรับการต้อนรับนะครับ 😊",
+    username: "Kuy Kuy",
+    userId: 1,
+    createdAt: "2025-07-22T12:05:00.000Z",
+    updatedAt: null,
+    attachmentUrl: null,
+    attachmentType: null,
+    attachmentName: null
+  },
+  {
+    id: 3,
+    content: "แอปแชทนี้ทำได้ดีมากเลย รองรับภาษาไทยได้เต็มที่ 👍",
+    username: "แอดมิน ระบบ",
+    userId: 4,
+    createdAt: "2025-07-22T12:10:00.000Z",
     updatedAt: null,
     attachmentUrl: null,
     attachmentType: null,

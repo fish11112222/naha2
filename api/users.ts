@@ -66,6 +66,36 @@ const DEFAULT_USERS: User[] = [
     isOnline: true,
     lastActivity: new Date().toISOString(),
     createdAt: "2025-07-22T12:00:00.000Z"
+  },
+  {
+    id: 3,
+    username: "sirinat",
+    email: "sirinat@gmail.com",
+    firstName: "Sirinat",
+    lastName: "Chanmali",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=sirinat",
+    bio: "ชอบเล่นเกม และพัฒนาแอปมือถือ",
+    location: "ภูเก็ต", 
+    website: "https://sirinat.dev",
+    dateOfBirth: "1993-08-22",
+    isOnline: false,
+    lastActivity: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    createdAt: "2025-07-20T15:30:00.000Z"
+  },
+  {
+    id: 4,
+    username: "admin",
+    email: "admin@chat.com",
+    firstName: "แอดมิน",
+    lastName: "ระบบ",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=admin",
+    bio: "ผู้ดูแลระบบแชท และพัฒนาฟีเจอร์ใหม่ๆ",
+    location: "ทั่วประเทศไทย",
+    website: "https://chat.example.com",
+    dateOfBirth: "1990-01-01",
+    isOnline: true,
+    lastActivity: new Date().toISOString(),
+    createdAt: "2025-07-15T08:00:00.000Z"
   }
 ];
 
