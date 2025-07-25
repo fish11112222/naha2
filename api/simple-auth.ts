@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { z } from 'zod';
 
 interface User {
   id: number;
@@ -98,25 +97,48 @@ function saveUsers(userList: User[]): void {
   (global as any)[SHARED_USERS_KEY] = userList;
 }
 
-function enableCors(res: VercelResponse) {
+function enableCors(res: VercelResponse): void {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 }
 
-const signUpSchema = z.object({
-  username: z.string().min(3, "ชื่อผู้ใช้ต้องมีอย่างน้อย 3 ตัวอักษร").max(20, "ชื่อผู้ใช้ไม่สามารถเกิน 20 ตัวอักษร"),
-  email: z.string().email("อีเมลไม่ถูกต้อง"),
-  password: z.string().min(6, "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"),
-  firstName: z.string().min(1, "กรุณาระบุชื่อจริง").max(50, "ชื่อจริงยาวเกินไป"),
-  lastName: z.string().min(1, "กรุณาระบุนามสกุล").max(50, "นามสกุลยาวเกินไป"),
-});
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
 
-const signInSchema = z.object({
-  email: z.string().email("อีเมลไม่ถูกต้อง"),
-  password: z.string().min(1, "กรุณาระบุรหัสผ่าน"),
-});
+function validateSignup(data: any): { valid: boolean; error?: string } {
+  if (!data.username || typeof data.username !== 'string') 
+    return { valid: false, error: 'กรุณาระบุชื่อผู้ใช้' };
+  if (data.username.length < 3 || data.username.length > 20) 
+    return { valid: false, error: 'ชื่อผู้ใช้ต้องมีความยาว 3-20 ตัวอักษร' };
+  
+  if (!data.email || !isValidEmail(data.email)) 
+    return { valid: false, error: 'อีเมลไม่ถูกต้อง' };
+  
+  if (!data.password || typeof data.password !== 'string' || data.password.length < 6) 
+    return { valid: false, error: 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร' };
+  
+  if (!data.firstName || typeof data.firstName !== 'string' || data.firstName.trim().length === 0) 
+    return { valid: false, error: 'กรุณาระบุชื่อจริง' };
+  
+  if (!data.lastName || typeof data.lastName !== 'string' || data.lastName.trim().length === 0) 
+    return { valid: false, error: 'กรุณาระบุนามสกุล' };
+  
+  return { valid: true };
+}
+
+function validateSignin(data: any): { valid: boolean; error?: string } {
+  if (!data.email || !isValidEmail(data.email)) 
+    return { valid: false, error: 'อีเมลไม่ถูกต้อง' };
+  
+  if (!data.password || typeof data.password !== 'string' || data.password.length === 0) 
+    return { valid: false, error: 'กรุณาระบุรหัสผ่าน' };
+  
+  return { valid: true };
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   enableCors(res);
@@ -150,17 +172,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (isSignup) {
       // SIGNUP
-      const validatedData = signUpSchema.parse(requestBody);
+      const validation = validateSignup(requestBody);
+      if (!validation.valid) {
+        return res.status(400).json({ message: validation.error });
+      }
+      
       const userList = getUsers();
       
       // Check if email already exists
-      const existingEmail = userList.find(u => u.email === validatedData.email);
+      const existingEmail = userList.find(u => u.email === requestBody.email);
       if (existingEmail) {
         return res.status(409).json({ message: 'อีเมลนี้ถูกใช้แล้ว' });
       }
 
       // Check if username already exists
-      const existingUsername = userList.find(u => u.username === validatedData.username);
+      const existingUsername = userList.find(u => u.username === requestBody.username);
       if (existingUsername) {
         return res.status(409).json({ message: 'ชื่อผู้ใช้นี้ถูกใช้แล้ว' });
       }
@@ -168,11 +194,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const newId = Math.max(...userList.map(u => u.id), 0) + 1;
       const newUser: User = {
         id: newId,
-        username: validatedData.username,
-        email: validatedData.email,
-        password: validatedData.password,
-        firstName: validatedData.firstName,
-        lastName: validatedData.lastName,
+        username: requestBody.username,
+        email: requestBody.email,
+        password: requestBody.password,
+        firstName: requestBody.firstName,
+        lastName: requestBody.lastName,
         avatar: null,
         bio: null,
         location: null,
@@ -191,11 +217,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(201).json(userWithoutPassword);
     } else {
       // SIGNIN
-      const validatedData = signInSchema.parse(requestBody);
+      const validation = validateSignin(requestBody);
+      if (!validation.valid) {
+        return res.status(400).json({ message: validation.error });
+      }
+      
       const userList = getUsers();
-      const user = userList.find(u => u.email === validatedData.email);
+      const user = userList.find(u => u.email === requestBody.email);
 
-      if (!user || user.password !== validatedData.password) {
+      if (!user || user.password !== requestBody.password) {
         return res.status(401).json({ message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
       }
 
@@ -210,13 +240,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ 
-        message: "ข้อมูลไม่ถูกต้อง", 
-        errors: error.errors 
-      });
-    }
-    
     console.error('Auth error:', error);
     return res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
   }

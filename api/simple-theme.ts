@@ -74,10 +74,10 @@ function setCurrentTheme(themeId: string): void {
   (global as any)[SHARED_THEME_KEY] = themeId;
 }
 
-function enableCors(res: VercelResponse) {
+function enableCors(res: VercelResponse): void {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 }
 

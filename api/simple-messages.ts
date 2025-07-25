@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { z } from 'zod';
 
 type Message = {
   id: number;
@@ -76,29 +75,32 @@ function generateMessageId(): number {
   return candidateId;
 }
 
-function enableCors(res: VercelResponse) {
+function enableCors(res: VercelResponse): void {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 }
 
-const messageSchema = z.object({
-  content: z.string().min(0, "").optional().default(""),
-  username: z.string().min(1),
-  userId: z.number(),
-  attachmentUrl: z.string().optional(),
-  attachmentType: z.enum(['image', 'file', 'gif']).optional(),
-  attachmentName: z.string().optional(),
-}).refine((data) => {
-  return (data.content && data.content.trim().length > 0) || (data.attachmentUrl && data.attachmentType);
-}, {
-  message: "กรุณาระบุข้อความหรือแนบไฟล์",
-});
+// Simple validation without zod to avoid TypeScript issues
+function validateMessage(data: any): boolean {
+  if (!data || typeof data !== 'object') return false;
+  if (!data.username || typeof data.username !== 'string') return false;
+  if (!data.userId || typeof data.userId !== 'number') return false;
+  
+  // Must have either content or attachment
+  const hasContent = data.content && typeof data.content === 'string' && data.content.trim().length > 0;
+  const hasAttachment = data.attachmentUrl && data.attachmentType;
+  
+  return hasContent || hasAttachment;
+}
 
-const updateMessageSchema = z.object({
-  content: z.string().min(1, "ข้อความไม่สามารถว่างได้").max(500, "ข้อความยาวเกินไป"),
-});
+function validateUpdateMessage(data: any): boolean {
+  if (!data || typeof data !== 'object') return false;
+  if (!data.content || typeof data.content !== 'string') return false;
+  if (data.content.trim().length === 0 || data.content.length > 500) return false;
+  return true;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   enableCors(res);
@@ -149,16 +151,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ message: 'ข้อมูลไม่ครบถ้วน' });
       }
       
-      const validatedData = messageSchema.parse(requestBody);
+      if (!validateMessage(requestBody)) {
+        return res.status(400).json({ message: 'กรุณาระบุข้อความหรือแนบไฟล์' });
+      }
       const newId = generateMessageId();
       const newMessage: Message = {
         id: newId,
-        content: validatedData.content || "",
-        username: validatedData.username,
-        userId: validatedData.userId,
-        attachmentUrl: validatedData.attachmentUrl || null,
-        attachmentType: validatedData.attachmentType || null,
-        attachmentName: validatedData.attachmentName || null,
+        content: requestBody.content || "",
+        username: requestBody.username,
+        userId: requestBody.userId,
+        attachmentUrl: requestBody.attachmentUrl || null,
+        attachmentType: requestBody.attachmentType || null,
+        attachmentName: requestBody.attachmentName || null,
         createdAt: new Date().toISOString(),
         updatedAt: null
       };
@@ -185,7 +189,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ message: 'ข้อมูลไม่ครบถ้วน' });
       }
 
-      const validatedData = updateMessageSchema.parse(requestBody);
+      if (!validateUpdateMessage(requestBody)) {
+        return res.status(400).json({ message: 'ข้อความไม่ถูกต้องหรือยาวเกินไป' });
+      }
       const userId = requestBody.userId || parseInt(req.query.userId as string);
       const id = parseInt(messageId);
 
@@ -202,7 +208,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       messageList[messageIndex] = {
         ...messageList[messageIndex],
-        content: validatedData.content,
+        content: requestBody.content,
         updatedAt: new Date().toISOString()
       };
 
@@ -236,13 +242,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ message: 'Method not allowed' });
     
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ 
-        message: "ข้อมูลไม่ถูกต้อง", 
-        errors: error.errors 
-      });
-    }
-    
     console.error('Messages error:', error);
     return res.status(500).json({ message: 'เกิดข้อผิดพลาดในเซิร์ฟเวอร์' });
   }

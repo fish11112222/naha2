@@ -73,10 +73,10 @@ function getUsers(): User[] {
   return (global as any)[SHARED_USERS_KEY];
 }
 
-function enableCors(res: VercelResponse) {
+function enableCors(res: VercelResponse): void {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 }
 
