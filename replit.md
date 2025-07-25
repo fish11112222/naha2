@@ -382,7 +382,7 @@ User requested communication exclusively in Thai language (คุยเป็น
 - 🔧 **พร้อม Deploy**: Vercel APIs พร้อมใช้งานเต็มรูปแบบ (เปลี่ยนธีม, แก้ไขโปรไฟล์, ลบข้อความ)
 
 ### Migration to Replit Environment Completed (July 25, 2025 - 10:10 AM)
-- ✅ **Successful migration from Replit Agent to standard Replit environment**
+- ✅ **Successful migration from Replit Agent to standard Relit environment**
 - ✅ **Fixed database connection issue by switching from DatabaseStorage to MemoryStorage**
 - ✅ **Removed conflicting Vercel API directory causing TypeScript compilation errors**
 - ✅ **Application running successfully on port 5000 with Express.js server**
@@ -391,6 +391,17 @@ User requested communication exclusively in Thai language (คุยเป็น
 - ✅ **All TypeScript compilation errors resolved**
 - ✅ **Vite hot reload working properly**
 - ✅ **Project ready for continued development in Replit environment**
+
+### Vercel Preview URL Authentication Issues (July 25, 2025 - 1:25 PM)
+- ⚠️ **Identified Vercel preview deployment protection issue**
+- ❌ **Preview URLs redirect to Vercel login page**: 
+  - `https://naha2-hliq-411vfb3ir-shuwuas-projects.vercel.app/` → HTTP 401
+  - `https://naha2-hliq-avmgtblxj-shuwuas-projects.vercel.app/` → HTTP 401
+- ✅ **Main domain works perfectly**: https://naha2-hliq.vercel.app/
+- ✅ **Enhanced authentication error handling with Thai language messages**
+- ✅ **API endpoints confirmed working**: Authentication, Messages, Theme APIs
+- ✅ **Working login credentials**: kuy@gmail.com/123456 และ admin@chat.com/admin123
+- 🎯 **Solution**: Always use main domain https://naha2-hliq.vercel.app/ instead of preview URLs
 
 ### Complete Vercel Deployment Fix (July 25, 2025 - 1:15 PM)
 - ✅ **แก้ไข Vercel 404 NOT_FOUND errors สมบูรณ์**
