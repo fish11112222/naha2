@@ -4,7 +4,12 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { email, password } = req.body;
+    // Parse body for Vercel
+    let body = req.body;
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+    const { email, password } = body;
 
     // Mock user data for demo
     const mockUsers = [
@@ -18,7 +23,7 @@ export default async function handler(req: any, res: any) {
       return res.status(401).json({ error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
     }
 
-    res.status(200).json({ user });
+    res.status(200).json(user);
   } catch (error) {
     res.status(500).json({ error: 'เกิดข้อผิดพลาดในระบบ' });
   }

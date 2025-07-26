@@ -38,13 +38,6 @@ export default function EnhancedChatPage({ currentUser, onSignOut }: EnhancedCha
   // Get messages with pagination
   const { data: messages = [], isLoading: messagesLoading, refetch: refetchMessages } = useQuery<Message[]>({
     queryKey: ["/api/messages"],
-    queryFn: async () => {
-      const response = await fetch("/api/messages?limit=100"); // Get last 100 messages
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      return response.json();
-    },
     refetchInterval: 3000,
     staleTime: 0,
     refetchOnWindowFocus: true,

@@ -31,7 +31,12 @@ export default async function handler(req: any, res: any) {
 
   if (req.method === 'POST') {
     try {
-      const { content, username, userId, attachmentUrl, attachmentType, attachmentName } = req.body;
+      // Parse body for Vercel
+      let body = req.body;
+      if (typeof body === 'string') {
+        body = JSON.parse(body);
+      }
+      const { content, username, userId, attachmentUrl, attachmentType, attachmentName } = body;
       
       const newMessage = {
         id: globalMessages.length + 1 + Math.floor(Math.random() * 1000),

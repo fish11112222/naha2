@@ -47,7 +47,12 @@ export default async function handler(req: any, res: any) {
 
   if (req.method === 'POST' || req.method === 'PUT') {
     try {
-      const { themeId } = req.body;
+      // Parse body for Vercel
+      let body = req.body;
+      if (typeof body === 'string') {
+        body = JSON.parse(body);
+      }
+      const { themeId } = body;
       const theme = availableThemes.find(t => t.id === themeId);
       
       if (!theme) {

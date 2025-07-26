@@ -4,7 +4,12 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { email, password, firstName, lastName, username } = req.body;
+    // Parse body for Vercel
+    let body = req.body;
+    if (typeof body === 'string') {
+      body = JSON.parse(body);
+    }
+    const { email, password, firstName, lastName, username } = body;
 
     // For demo purposes, return success
     const newUser = {
@@ -16,7 +21,7 @@ export default async function handler(req: any, res: any) {
       createdAt: new Date().toISOString()
     };
 
-    res.status(201).json({ user: newUser });
+    res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ error: 'เกิดข้อผิดพลาดในการสมัครสมาชิก' });
   }
