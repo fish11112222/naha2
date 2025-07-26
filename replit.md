@@ -430,6 +430,16 @@ User requested communication exclusively in Thai language (คุยเป็น
 - ✅ **Complete functionality restored**: Ready for full user testing
 - 🎯 **Status**: Thai Chat App fully operational on Vercel
 
+### Vercel Build Sync Issue (July 26, 2025 - 4:00 AM)
+- ⚠️ **White screen returned**: https://naha2-hliq.vercel.app/ shows white screen
+- 🔍 **Root cause identified**: Vercel has old build with mismatched JS filename
+- 📊 **File mismatch**: 
+  - Vercel HTML: `index-CAlJybmm.js` (old build)
+  - Local build: `index-DvqMtWjI.js` (current build)
+- ✅ **CSS loading fine**: Style file loads correctly from Vercel
+- ✅ **Local development working**: App runs perfectly on port 5000
+- 🎯 **Solution needed**: Redeploy to Vercel to sync latest build files
+
 ### Complete Vercel Deployment Fix (July 25, 2025 - 1:15 PM)
 - ✅ **แก้ไข Vercel 404 NOT_FOUND errors สมบูรณ์**
 - ✅ **สร้าง API endpoints ใหม่สำหรับ Vercel**: /api/auth/signin, /api/auth/signup, /api/messages, /api/theme, /api/users
